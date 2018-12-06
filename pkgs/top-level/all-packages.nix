@@ -16226,6 +16226,8 @@ in
 
   ctop = callPackage ../tools/system/ctop { };
 
+  ctrtool = callPackage ../tools/compression/ctrtool { };
+
   cuneiform = callPackage ../tools/graphics/cuneiform {};
 
   cutecom = libsForQt5.callPackage ../tools/misc/cutecom { };
