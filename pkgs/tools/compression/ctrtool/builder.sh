@@ -11,4 +11,3 @@ make -j3
 
 mkdir -p $out/bin
 cp ctrtool $out/bin
-ls
