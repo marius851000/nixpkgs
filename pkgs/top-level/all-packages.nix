@@ -16227,6 +16227,7 @@ in
   ctop = callPackage ../tools/system/ctop { };
 
   ctrtool = callPackage ../tools/compression/ctrtool { };
+  makerom = callPackage ../tools/compression/makerom { };
 
   cuneiform = callPackage ../tools/graphics/cuneiform {};
 
