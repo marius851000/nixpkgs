@@ -3160,6 +3160,8 @@ in
 
   gtk-vnc = callPackage ../tools/admin/gtk-vnc {};
 
+  gtkglext = callPackage ../desktops/gnome-2/platform/gtkglext {};
+  
   gtmess = callPackage ../applications/networking/instant-messengers/gtmess { };
 
   gup = callPackage ../development/tools/build-managers/gup {};
