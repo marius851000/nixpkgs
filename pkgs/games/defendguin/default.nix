@@ -22,7 +22,9 @@ stdenv.mkDerivation rec {
 
   meta = {
     homepage = http://www.newbreedsoftware.com/defendguin/;
-    description = "Defendguin is a clone of the arcade game \"Defender,\" but with a Linux theme. Your mission is to defend little penguinoids from being captured and mutated.";
+    downloadPage = http://www.newbreedsoftware.com/defendguin/download/;
+    description = "A game based on the arcade game \"Defender\".";
+    longDescription = "Defendguin is a clone of the arcade game \"Defender,\" but with a Linux theme. Your mission is to defend little penguinoids from being captured and mutated.";
     license = stdenv.lib.licenses.gpl2;
   };
 }
