@@ -2617,6 +2617,12 @@
     github = "marcweber";
     name = "Marc Weber";
   };
+  marius851000 = {
+    email = "mariusdavid@laposte.net";
+    github = "marius851000";
+    name = "Marius David";
+  };
+  
   markus1189 = {
     email = "markus1189@gmail.com";
     github = "markus1189";

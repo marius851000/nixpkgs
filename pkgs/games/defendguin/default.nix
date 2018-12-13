@@ -26,5 +26,6 @@ stdenv.mkDerivation rec {
     description = "A game based on the arcade game \"Defender\".";
     longDescription = "Defendguin is a clone of the arcade game \"Defender,\" but with a Linux theme. Your mission is to defend little penguinoids from being captured and mutated.";
     license = stdenv.lib.licenses.gpl2;
+    maintainers = with maintainers; [ marius851000 ];
   };
 }
