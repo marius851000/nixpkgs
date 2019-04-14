@@ -1,6 +1,7 @@
 { lib, stdenvNoCC, curl }: # Note that `curl' may be `null', in case of the native stdenvNoCC.
 
 let
+  inherit (builtins) trace;
 
   mirrors = import ./mirrors.nix;
 
@@ -111,9 +112,8 @@ let
     else throw "fetchurl requires a hash for fixed-output derivation: ${lib.concatStringsSep ", " urls_}";
 in
 
-stdenvNoCC.mkDerivation {
-  name =
-    if showURLs then "urls"
+trace (lib.concatStrings(["fetchurl: " (lib.concatStringsSep ", " urls_) " hash: " hash_.outputHashAlgo ":" hash_.outputHash])) stdenvNoCC.mkDerivation {
+  name = if showURLs then "urls"
     else if name != "" then name
     else baseNameOf (toString (builtins.head urls_));
 
@@ -121,11 +121,11 @@ stdenvNoCC.mkDerivation {
 
   nativeBuildInputs = [ curl ];
 
-  urls = urls_;
+  urls = urls_; #trace (lib.concatStrings(["fetchurl:" url]))
 
   # If set, prefer the content-addressable mirrors
   # (http://tarballs.nixos.org) over the original URLs.
-  preferHashedMirrors = true;
+  preferHashedMirrors = false;
 
   # New-style output content requirements.
   inherit (hash_) outputHashAlgo outputHash;
