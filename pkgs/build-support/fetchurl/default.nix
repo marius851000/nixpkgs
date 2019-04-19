@@ -112,7 +112,7 @@ let
     else throw "fetchurl requires a hash for fixed-output derivation: ${lib.concatStringsSep ", " urls_}";
 in
 
-trace (lib.concatStrings(["fetchurl: " (lib.concatStringsSep ", " urls_) " hash: " hash_.outputHashAlgo ":" hash_.outputHash])) stdenvNoCC.mkDerivation {
+trace (lib.concatStrings(["|||fetchurl: " (lib.concatStringsSep ", " urls_) "|hash: " hash_.outputHashAlgo ":" hash_.outputHash "|r=" ( if recursiveHash then "True" else "False") ])) stdenvNoCC.mkDerivation {
   name = if showURLs then "urls"
     else if name != "" then name
     else baseNameOf (toString (builtins.head urls_));

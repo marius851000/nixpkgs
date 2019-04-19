@@ -16,7 +16,7 @@ import <nix/fetchurl.nix> {
   url =
     # Handle mirror:// URIs. Since <nix/fetchurl.nix> currently
     # supports only one URI, use the first listed mirror.
-    trace (concatStringsSep "" ["callboot: " url " hash: sha256:" sha256]) (let m = builtins.match "mirror://([a-z]+)/(.*)" url; in
+    trace (concatStringsSep "" ["|||callboot: " url "|hash: sha256:" sha256 "|r: False"]) (let m = builtins.match "mirror://([a-z]+)/(.*)" url; in
     if m == null then url
     else builtins.head (mirrors.${builtins.elemAt m 0}) + (builtins.elemAt m 1));
 }
