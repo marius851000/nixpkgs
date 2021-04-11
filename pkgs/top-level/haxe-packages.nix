@@ -193,5 +193,15 @@ let
       };
     };
 
+    flixel-addons = buildHaxeLib {
+      libname = "flixel-addons";
+      version = "2.11.0";
+      sha256 = "sha256-mRKpLzhlh1UXxIdg1/a0NTVzriNEW1wsSirL1UOkvAI=";
+      meta = with lib; {
+        license = licenses.mit;
+        description = "Set of useful, but optional classes for HaxeFlixel created by the community";
+      };
+    };
+
   };
 in self
