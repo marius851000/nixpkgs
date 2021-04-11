@@ -213,5 +213,15 @@ let
       };
     };
 
+    newgrounds = buildHaxeLib {
+      libname = "newgrounds";
+      version = "1.1.5";
+      sha256 = "sha256-Aqc6HYPva3YyerMLgC9tsAVO8DJrko/sWZbVFCfeAsE=";
+      meta = with lib; {
+        license = licenses.mit;
+        description = "Newgrounds API for haxe";
+      };
+    };
+
   };
 in self
