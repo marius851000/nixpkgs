@@ -223,5 +223,15 @@ let
       };
     };
 
+    polymod = buildHaxeLib {
+      libname = "polymod";
+      version = "1.5.2";
+      sha256 = "sha256-iKikj+KDg8qanuA+50cleKwXXsitNUY2sqhRCVMslAo=";
+      meta = with lib; {
+        license = licenses.mit;
+        description = "Atomic modding framework for Haxe games/apps";
+      };
+    };
+
   };
 in self
