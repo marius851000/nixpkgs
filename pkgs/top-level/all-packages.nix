@@ -27773,6 +27773,8 @@ in
 
   freesweep = callPackage ../games/freesweep { };
 
+  friday-night-funkin = callPackage ../games/friday-night-funkin {};
+
   frotz = callPackage ../games/frotz { };
 
   frogatto = callPackage ../games/frogatto { };
