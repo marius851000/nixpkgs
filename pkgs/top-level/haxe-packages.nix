@@ -60,6 +60,13 @@ let
       });
 
 
+    flixel-ui = buildHaxeLib rec {
+      libname = "flixel-ui";
+      version = "2.3.3";
+      sha256 = "sha256-avIYNo6RGhSrRVldDTTcIbv90y6Pubhckmfz8NiXOvc=";
+      meta.description = "A UI library for Flixel";
+    };
+
     hscript = buildHaxeLib rec {
       libname = "hscript";
       version = "2.4.0";
