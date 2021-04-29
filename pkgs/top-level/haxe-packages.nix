@@ -59,6 +59,14 @@ let
         } // attrs.meta;
       });
 
+
+    hscript = buildHaxeLib rec {
+      libname = "hscript";
+      version = "2.4.0";
+      sha256 = "sha256-vcMlDt4NYgnbs9U7mIGJn3MxWtBb9USLCDvIchZ+vWE=";
+      meta.description = "A scripting engine for a subset of the Haxe language";
+    };
+
     hxcpp = buildHaxeLib rec {
       libname = "hxcpp";
       version = "4.1.15";
