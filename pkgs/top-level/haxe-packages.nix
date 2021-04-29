@@ -23,7 +23,8 @@ let
     buildHaxeLib = {
       libname,
       version,
-      sha256,
+      src ? null,
+      sha256 ? null,
       meta,
       ...
     } @ attrs:
@@ -31,20 +32,19 @@ let
         name = "${libname}-${version}";
 
         buildInputs = (attrs.buildInputs or []) ++ [ haxe neko ]; # for setup-hook.sh to work
-        src = fetchzip rec {
-          name = "${libname}-${version}";
-          url = "http://lib.haxe.org/files/3.0/${withCommas name}.zip";
-          inherit sha256;
-          stripRoot = false;
-        };
+        src = if src != null then src else
+          (fetchzip rec {
+            name = "${libname}-${version}";
+            url = "http://lib.haxe.org/files/3.0/${withCommas name}.zip";
+            inherit sha256;
+            stripRoot = false;
+          });
 
         installPhase = attrs.installPhase or ''
           runHook preInstall
           (
-            if [ $(ls $src | wc -l) == 1 ]; then
-              cd $src/* || cd $src
-            else
-              cd $src
+            if [ $(ls . | wc -l) == 1 ]; then
+              cd *
             fi
             ${installLibHaxe { inherit libname version; }}
           )
