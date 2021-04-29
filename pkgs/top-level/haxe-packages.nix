@@ -162,5 +162,16 @@ let
         description = "A foundational Haxe framework for cross-platform development ";
       };
     };
+
+    newgrounds = buildHaxeLib {
+      libname = "newgrounds";
+      version = "1.1.4";
+      sha256 = "sha256-8js47AgZJA/IB1PCGhocylQ0gMaGBdYdTkDMIXHkZFI=";
+      patchPhase = ''
+        substituteInPlace lib/Source/io/newgrounds/NG.hx \
+          --replace /usr/bin/xdg-open ${xdg-utils}/bin/xdg-open
+      '';
+      meta.description = "Newgrounds API for haxe";
+    };
   };
 in self
