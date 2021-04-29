@@ -183,5 +183,20 @@ let
         description = "The \"Open Flash Library\" for fast 2D development";
       };
     };
+    
+    polymod = buildHaxeLib {
+      libname = "polymod";
+      version = "2021-4-6";
+      src = fetchFromGitHub {
+        owner = "larsiusprime";
+        repo = "polymod";
+        rev = "bb5f0a120419ac3a7132d96aff1e6f7a36b97d67";
+        sha256 = "sha256-jvZI43iZfMOnsVcsCE0kjJQcDkRKP2I+noCzSpxU2ak=";
+      };
+      meta = {
+        description = "An atomic modding framework for Haxe games/apps.";
+        site = "https://github.com/larsiusprime/polymod";
+      };
+    };
   };
 in self
