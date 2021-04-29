@@ -173,5 +173,15 @@ let
       '';
       meta.description = "Newgrounds API for haxe";
     };
+
+    openfl = buildHaxeLib {
+      libname = "openfl";
+      version = "9.1.0";
+      sha256 = "sha256-Nb6JrhbATSTwVbsesSaAMpLuSCwUUmW+FG2cdBrSKWY=";
+      meta = {
+        homepage = "https://www.openfl.org/";
+        description = "The \"Open Flash Library\" for fast 2D development";
+      };
+    };
   };
 in self
