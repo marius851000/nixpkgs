@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchzip, fetchFromGitHub, haxe, neko, jdk, mono }:
+{ stdenv, lib, fetchzip, fetchFromGitHub, haxe, neko, jdk, mono, xdg-utils }:
 
 let
   self = haxePackages;
@@ -144,6 +144,22 @@ let
         license = lib.licenses.bsd2;
         platforms = lib.platforms.all;
         description = "Extern definitions for node.js 6.9";
+      };
+    };
+    
+    lime = buildHaxeLib {
+      libname = "lime";
+      version = "7.9.0";
+      sha256 = "sha256-7UBSgzQEQjmMYk2MGfMZPYSj3quWbiP8LWM+vtyeWFg=";
+      patchPhase = ''
+        substituteInPlace src/lime/system/System.hx \
+          --replace /usr/bin/xdg-open ${xdg-utils}/bin/xdg-open
+        substituteInPlace src/lime/tools/CommandHelper.hx \
+          --replace /usr/bin/xdg-open ${xdg-utils}/bin/xdg-open
+      '';
+      meta = {
+        homepage = "https://lime.software/";
+        description = "A foundational Haxe framework for cross-platform development ";
       };
     };
   };
