@@ -69,6 +69,13 @@ let
       ];
     };
 
+    flixel-addons = buildHaxeLib rec {
+      libname = "flixel-addons";
+      version = "2.10.0";
+      sha256 = "sha256-T018qtJDbS9Th5dkLXISaW0w8w+CeJ/vOwlU8c+WoNU=";
+      meta.description = "A set of useful, additional classes for HaxeFlixel.";
+    };
+
     flixel-ui = buildHaxeLib rec {
       libname = "flixel-ui";
       version = "2.3.3";
