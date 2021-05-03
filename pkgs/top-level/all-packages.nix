@@ -31837,6 +31837,8 @@ with pkgs;
     };
   };
 
+  funkin = callPackage ../games/funkin { };
+
   galaxis = callPackage ../games/galaxis { };
 
   gambatte = callPackage ../games/gambatte { };
