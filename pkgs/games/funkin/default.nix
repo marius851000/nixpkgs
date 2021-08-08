@@ -1,11 +1,19 @@
 { stdenv, lib, fetchFromGitHub, fetchpatch
 , haxe, haxePackages, neko, makeWrapper
 , alsaLib, libpulseaudio, libGL, libX11, libXdmcp, libXext, libXi, libXinerama, libXrandr
-, xdg-utils
+, xdg-utils, makeDesktopItem
 }:
 
 let
   runtimeDeps = [ alsaLib libpulseaudio libGL libX11 libXdmcp libXext libXi libXinerama libXrandr ];
+
+  desktopItem = makeDesktopItem {
+    name = "funkin";
+    exec = "Funkin";
+    desktopName = "Friday Night Funkin";
+    categories = "Game;ArcadeGame";
+    icon = "funkin";
+  };
 in
 stdenv.mkDerivation rec {
   pname = "funkin";
@@ -94,6 +102,21 @@ stdenv.mkDerivation rec {
       --prefix PATH : ${lib.makeBinPath [ xdg-utils ]} \
       --run "cd $out/lib/funkin"
     ln -s $out/{lib/funkin,bin}/Funkin
+    
+    # desktop file
+    mkdir -p $out/share/applications
+    ln -s ${desktopItem}/share/applications/* $out/share/applications
+    
+    # icons
+    mkdir -p $out/share/icons/hicolor/16x16/apps
+    mkdir -p $out/share/icons/hicolor/32x32/apps
+    mkdir -p $out/share/icons/hicolor/64x64/apps
+    mkdir -p $out/share/icons/hicolor/512x512/apps
+    cp art/icon16.png $out/share/icons/hicolor/16x16/apps/funkin.png
+    cp art/icon32.png $out/share/icons/hicolor/32x32/apps/funkin.png
+    cp art/icon64.png $out/share/icons/hicolor/64x64/apps/funkin.png
+    # the size of the icon is actually 600x600 px
+    cp art/iconOG.png $out/share/icons/hicolor/512x512/apps/funkin.png
 
     runHook postInstall
   '';
