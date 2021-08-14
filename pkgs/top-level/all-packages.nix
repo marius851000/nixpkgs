@@ -10602,7 +10602,7 @@ in
       graphviz = graphviz-nox;
     });
 
-  inherit (callPackage ../development/compilers/haxe { })
+  inherit (callPackages ../development/compilers/haxe { })
     haxe_4_2
     haxe_4_1
     haxe_4_0

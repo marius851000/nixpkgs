@@ -1,7 +1,7 @@
 { stdenv, lib, fetchFromGitHub, fetchpatch
-, haxe, haxePackages, neko, makeWrapper
+, haxe_4_1, haxePackages, neko, makeWrapper
 , alsaLib, libpulseaudio, libGL, libX11, libXdmcp, libXext, libXi, libXinerama, libXrandr
-, makeDesktopItem
+, makeDesktopItem, buildPackages
 }:
 
 let
@@ -46,7 +46,11 @@ stdenv.mkDerivation rec {
     EOF
   '';
 
-  nativeBuildInputs = [ haxe neko makeWrapper ]
+  
+
+  nativeBuildInputs = [ haxe_4_1 neko makeWrapper ];
+
+  buildInputs = [ alsaLib libpulseaudio libGL libX11 libXdmcp libXext libXi libXinerama libXrandr ]
   ++ (with haxePackages; [
     hxcpp
     hscript
@@ -59,8 +63,6 @@ stdenv.mkDerivation rec {
     polymod
     discord_rpc
   ]);
-
-  buildInputs = [ alsaLib libpulseaudio libGL libX11 libXdmcp libXext libXi libXinerama libXrandr ];
 
   enableParallelBuilding = true;
 
@@ -125,6 +127,5 @@ stdenv.mkDerivation rec {
     license = licenses.asl20;
     platforms = platforms.all;
     maintainers = with maintainers; [ OPNA2608 ];
-    broken = stdenv.system != "x86_64-linux";
   };
 }
