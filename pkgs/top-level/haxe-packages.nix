@@ -219,5 +219,20 @@ let
       };
     };
 
+    linc_luajit = buildHaxeLib {
+      libname = "linc_luajit";
+      version = "unstable-2021-05-08";
+      src = fetchFromGitHub {
+        owner = "AndreiRudenko";
+        repo = "linc_luajit";
+        rev = "e0e1e43799abcfa9afcfb1edb7c29d174546ac03";
+        sha256 = "sha256-PIg/kRdz10d2AkvHTro1cCFqPPJO2uv7yPVnNAnLuJs=";
+      };
+      prePatch = "rm -r lib";
+      meta = with lib; {
+        license = licenses.mit;
+        description = "Native bindings for lua";
+      };
+    };
   };
 in self
