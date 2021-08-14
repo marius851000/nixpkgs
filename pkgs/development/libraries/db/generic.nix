@@ -28,7 +28,9 @@ stdenv.mkDerivation (rec {
       (if compat185 then "--enable-compat185" else "--disable-compat185")
     ]
     ++ lib.optional dbmSupport "--enable-dbm"
-    ++ lib.optional stdenv.isFreeBSD "--with-pic";
+    ++ lib.optional stdenv.isFreeBSD "--with-pic"
+    # The configure script can't execute tests while cross compiling
+    ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) "--disable-atomicsupport";
 
   preConfigure = ''
     cd build_unix

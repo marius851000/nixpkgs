@@ -12,6 +12,14 @@ assert ldapSupport -> openldap != null;
 
 with lib;
 
+let
+  db_version_lib = let
+    # if the db package add a version field, use it
+    db_version = lib.elemAt (lib.splitString "-" db.name) 1;
+    db_version_splited = lib.splitString "." db_version;
+  in
+    (lib.elemAt db_version_splited 0) + (lib.elemAt db_version_splited 1);
+in
 stdenv.mkDerivation rec {
   pname = "apr-util";
   version = "1.6.1";
@@ -22,6 +30,12 @@ stdenv.mkDerivation rec {
   };
 
   patches = optional stdenv.isFreeBSD ./include-static-dependencies.patch;
+
+  # The script have issue finding the good version when cross-compiling
+  postPatch = if bdbSupport then ''
+    substituteInPlace configure \
+      --replace db_version=69 db_version=${db_version_lib}
+  '' else "";
 
   outputs = [ "out" "dev" ];
   outputBin = "dev";
@@ -38,11 +52,13 @@ stdenv.mkDerivation rec {
         "--without-freetds" "--without-berkeley-db" "--without-crypto" ]
     ;
 
-  propagatedBuildInputs = [ makeWrapper apr expat libiconv ]
+  propagatedBuildInputs = [ apr expat libiconv ]
     ++ optional sslSupport openssl
     ++ optional bdbSupport db
     ++ optional ldapSupport openldap
     ++ optional stdenv.isFreeBSD cyrus_sasl;
+  
+  nativeBuildInputs = [ makeWrapper ];
 
   postInstall = ''
     for f in $out/lib/*.la $out/lib/apr-util-1/*.la $dev/bin/apu-1-config; do
