@@ -1,31 +1,38 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, fetchpatch
 , substituteAll
 , binutils
-, asciidoc
+, asciidoctor
 , cmake
 , perl
 , zstd
+, bashInteractive
 , xcodebuild
 , makeWrapper
 }:
 
 let ccache = stdenv.mkDerivation rec {
   pname = "ccache";
-  version = "4.2.1";
+  version = "4.4.1";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-AmgJpW7AGCSggbHp1fLO5yhXS9LIm7O77nQdDERJYAA=";
+    hash = "sha256-zsJoaaxYVV78vsxq2nbOh9ZAU1giKp8Kh6qJFL120CQ=";
   };
 
+  outputs = [ "out" "man" ];
+
   patches = [
-    # test/run use compgen to get environment variable names, but
-    # compgen isn't available in non-interactive bash.
-    ./env-instead-of-compgen.patch
+    # Use the shell builtin pwd for the basedir test
+    # See https://github.com/ccache/ccache/pull/933
+    (fetchpatch {
+      url = "https://github.com/ccache/ccache/commit/58fd1fbe75a1b5dc3f9151947ace15164fdef91c.patch";
+      sha256 = "BoBn4YSDy8pQxJ+fQHSsrUZDBVeLFWXIQ6CunDwMO7o=";
+    })
 
     # When building for Darwin, test/run uses dwarfdump, whereas on
     # Linux it uses objdump. We don't have dwarfdump packaged for
@@ -37,19 +44,35 @@ let ccache = stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ asciidoc cmake perl ];
-
+  nativeBuildInputs = [ asciidoctor cmake perl ];
   buildInputs = [ zstd ];
 
-  outputs = [ "out" "man" ];
+  cmakeFlags = [
+    # Build system does not autodetect redis library presence.
+    # Requires explicit flag.
+    "-DREDIS_STORAGE_BACKEND=OFF"
+  ];
 
   doCheck = true;
-  checkInputs = lib.optional stdenv.isDarwin xcodebuild;
-  checkPhase = ''
+  checkInputs = [
+    # test/run requires the compgen function which is available in
+    # bashInteractive, but not bash.
+    bashInteractive
+  ] ++ lib.optional stdenv.isDarwin xcodebuild;
+
+  checkPhase = let
+    badTests = [
+      "test.trim_dir" # flaky on hydra (possibly filesystem-specific?)
+    ] ++ lib.optionals stdenv.isDarwin [
+      "test.basedir"
+      "test.multi_arch"
+      "test.nocpp2"
+    ];
+  in ''
+    runHook preCheck
     export HOME=$(mktemp -d)
-    ctest --output-on-failure ${lib.optionalString stdenv.isDarwin ''
-      -E '^(test.nocpp2|test.basedir|test.multi_arch)$'
-    ''}
+    ctest --output-on-failure -E '^(${lib.concatStringsSep "|" badTests})$'
+    runHook postCheck
   '';
 
   passthru = {
@@ -99,7 +122,7 @@ let ccache = stdenv.mkDerivation rec {
     homepage = "https://ccache.dev";
     downloadPage = "https://ccache.dev/download.html";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ metadark r-burns ];
+    maintainers = with maintainers; [ kira-bruneau r-burns ];
     platforms = platforms.unix;
   };
 };

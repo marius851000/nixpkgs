@@ -7,13 +7,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "fst";
-  version = "0.4.5";
+  version = "0.4.7";
 
   src = fetchFromGitHub {
     owner = "BurntSushi";
     repo = pname;
     rev = version;
-    sha256 = "01qdj7zzgwb1zqcznfmnks3dnl6hnf8ib0sm0sgimsbcvajmhab3";
+    sha256 = "sha256-fXbX6idoGBtQiKM37C0z89OH/5H2PkZdwYLksXbbakE=";
   };
 
   cargoPatches = [
@@ -22,7 +22,7 @@ rustPlatform.buildRustPackage rec {
   ];
 
   cargoBuildFlags = [ "--workspace" ];
-  cargoSha256 = "0svn2gzipslz939396rcydqx3i1x07l7acas7fhql12n59n2yrxw";
+  cargoSha256 = "sha256-2gy4i4CwZP6LB5ea1LBSfeAV6bNnsvDbxw0Unur0Hm4=";
 
   buildInputs = lib.optionals stdenv.isDarwin [ libiconv ];
 

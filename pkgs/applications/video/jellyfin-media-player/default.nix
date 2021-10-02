@@ -26,23 +26,25 @@
 
 mkDerivation rec {
   pname = "jellyfin-media-player";
-  version = "1.4.0";
+  version = "1.6.1";
 
   src = fetchFromGitHub {
     owner = "jellyfin";
     repo = "jellyfin-media-player";
     rev = "v${version}";
-    sha256 = "sha256-zNEjhBya2loqFYS8Rjs8CMCfvie2/UbxreF8CUwDWWk=";
+    sha256 = "sha256-iqwOv95JFxQ1j/9B+oBFAp7mD1/1g2EJYvvUKbrDQes=";
   };
 
   jmpDist = fetchzip {
-    url = "https://github.com/iwalton3/jellyfin-web-jmp/releases/download/jwc-10.7.2-1/dist.zip";
-    sha256 = "sha256-oTZyIh2m9z55sNIeKtHxVijBMcTtJgpojG5HUToMYoA=";
+    url = "https://github.com/iwalton3/jellyfin-web-jmp/releases/download/jwc-10.7.3/dist.zip";
+    sha256 = "sha256-P7WEYbVvpaVLwMgqC2e8QtMOaJclg0bX78J1fdGzcCU=";
   };
 
   patches = [
     # the webclient-files are not copied in the regular build script. Copy them just like the linux build
     ./fix-osx-resources.patch
+    # disable update notifications since the end user can't simply download the release artifacts to update
+    ./disable-update-notifications.patch
   ];
 
   buildInputs = [
@@ -101,8 +103,9 @@ mkDerivation rec {
   meta = with lib; {
     homepage = "https://github.com/jellyfin/jellyfin-media-player";
     description = "Jellyfin Desktop Client based on Plex Media Player";
-    license = with licenses; [ gpl2Plus mit ];
+    license = with licenses; [ gpl2Only mit ];
     platforms = [ "x86_64-linux" "x86_64-darwin" ];
-    maintainers = with maintainers; [ jojosch ];
+    maintainers = with maintainers; [ jojosch kranzes ];
+    mainProgram = "jellyfinmediaplayer";
   };
 }

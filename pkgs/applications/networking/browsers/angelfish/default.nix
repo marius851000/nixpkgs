@@ -1,6 +1,6 @@
 { lib
 , mkDerivation
-, fetchFromGitLab
+, fetchurl
 , cmake
 , corrosion
 , extra-cmake-modules
@@ -12,6 +12,7 @@
 , knotifications
 , kpurpose
 , kwindowsystem
+, qtfeedback
 , qtquickcontrols2
 , qtwebengine
 , rustPlatform
@@ -19,20 +20,17 @@
 
 mkDerivation rec {
   pname = "angelfish";
-  version = "1.8.0";
+  version = "21.08";
 
-  src = fetchFromGitLab {
-    domain = "invent.kde.org";
-    owner = "plasma-mobile";
-    repo = "angelfish";
-    rev = "v${version}";
-    sha256 = "0pj2kw7lmxh7diwdcmk24qxqslavhvf23r2i6h549gbllbzk219f";
+  src = fetchurl {
+    url = "mirror://kde/stable/plasma-mobile/${version}/angelfish-${version}.tar.xz";
+    sha256 = "1gzvlha159bw767mj8lisn89592j4j4dazzfws3v4anddjh60xnh";
   };
 
   cargoDeps = rustPlatform.fetchCargoTarball {
     inherit src;
     name = "${pname}-${version}";
-    sha256 = "0cyrmhlg0kjr14842ckbjdljc2zc28al0y9i8w5l0qzr18krgc0m";
+    sha256 = "1pbvw9hdzn3i97mahdy9y6jnjsmwmjs3lxfz7q6r9r10i8swbkak";
   };
 
   nativeBuildInputs = [
@@ -58,13 +56,14 @@ mkDerivation rec {
     knotifications
     kpurpose
     kwindowsystem
+    qtfeedback
     qtquickcontrols2
     qtwebengine
   ];
 
   meta = with lib; {
     description = "Web browser for Plasma Mobile";
-    homepage = "https://apps.kde.org/en/mobile.angelfish";
+    homepage = "https://invent.kde.org/plasma-mobile/angelfish";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ dotlambda ];
   };

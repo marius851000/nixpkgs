@@ -8,6 +8,7 @@
 , libGL
 , libGLU
 , libjpeg
+, xorg
 , ncurses
 , libpng, libtool, mpfr, openssl, pango, poppler
 , readline, sqlite
@@ -47,7 +48,7 @@ in
 
 stdenv.mkDerivation rec {
   pname = "racket";
-  version = "8.0"; # always change at once with ./minimal.nix
+  version = "8.2"; # always change at once with ./minimal.nix
 
   src = (lib.makeOverridable ({ name, sha256 }:
     fetchurl {
@@ -56,7 +57,7 @@ stdenv.mkDerivation rec {
     }
   )) {
     name = "${pname}-${version}";
-    sha256 = "0lqqpa88v0br93qw7450a4blyi3pwn7sq2k04h0ikbsqrdnfj7lj";
+    sha256 = "10kl9xxl9swz8hdpycpy1vjc8biah5h07dzaygsf0ylfjdrczwx0";
   };
 
   FONTCONFIG_FILE = fontsConf;
@@ -96,6 +97,9 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = false;
 
+  postFixup = lib.optionalString stdenv.isDarwin ''
+    wrapProgram $out/bin/drracket --prefix DYLD_LIBRARY_PATH : ${xorg.libX11}/lib
+  '';
 
   meta = with lib; {
     description = "A programmable programming language";
@@ -112,6 +116,5 @@ stdenv.mkDerivation rec {
     license = with licenses; [ asl20 /* or */ mit ];
     maintainers = with maintainers; [ kkallio henrytill vrthra ];
     platforms = [ "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
-    broken = stdenv.isDarwin; # No support yet for setting FFI lookup path
   };
 }

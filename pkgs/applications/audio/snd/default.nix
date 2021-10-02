@@ -1,19 +1,19 @@
 { lib, stdenv, fetchurl, pkg-config
-, alsaLib, fftw, gsl, motif, xorg
+, alsa-lib, fftw, gsl, motif, xorg
 }:
 
 stdenv.mkDerivation rec {
   pname = "snd";
-  version = "21.1";
+  version = "21.7";
 
   src = fetchurl {
     url = "mirror://sourceforge/snd/snd-${version}.tar.gz";
-    sha256 = "1jxvpgx1vqa6bwdzlzyzrjn2swjf9nfhzi9r1r96ivi0870vvjk3";
+    sha256 = "sha256-GjaPZmJfodvYvhObGcBDRN0mIyc6Vxycd0BZGHdvoJA=";
   };
 
   nativeBuildInputs = [ pkg-config ];
 
-  buildInputs = [ alsaLib fftw gsl motif ]
+  buildInputs = [ alsa-lib fftw gsl motif ]
     ++ (with xorg; [ libXext libXft libXpm libXt ]);
 
   configureFlags = [ "--with-motif" ];

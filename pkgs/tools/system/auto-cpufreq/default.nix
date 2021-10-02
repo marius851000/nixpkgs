@@ -1,14 +1,14 @@
-{ lib, python3Packages, fetchFromGitHub }:
+{ lib, python3Packages, fetchFromGitHub, substituteAll }:
 
 python3Packages.buildPythonPackage rec {
   pname = "auto-cpufreq";
-  version = "1.6.1";
+  version = "1.6.9";
 
   src = fetchFromGitHub {
     owner = "AdnanHodzic";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-oz3C1150CPfT0kkx1x7VIX/Rm06dkjyxeDPFCRJaWNc=";
+    sha256 = "1pri182cgbrhr0adq2784gpv6q8c8kjr0jsh8wpvd1wvfsbqywrm";
   };
 
   propagatedBuildInputs = with python3Packages; [ click distro psutil ];
@@ -16,8 +16,16 @@ python3Packages.buildPythonPackage rec {
   doCheck = false;
   pythonImportsCheck = [ "auto_cpufreq" ];
 
-  # patch to prevent script copying and to disable install
-  patches = [ ./prevent-install-and-copy.patch ];
+  patches = [
+    # hardcodes version output
+    (substituteAll {
+      src = ./fix-version-output.patch;
+      inherit version;
+    })
+
+    # patch to prevent script copying and to disable install
+    ./prevent-install-and-copy.patch
+  ];
 
   postInstall = ''
     # copy script manually

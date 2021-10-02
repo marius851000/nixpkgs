@@ -124,7 +124,8 @@ in
         example = "/run/keys/ssmtp-authpass";
         description = ''
           Path to a file that contains the password used for SMTP auth. The file
-          should not contain a trailing newline, if the password does not contain one.
+          should not contain a trailing newline, if the password does not contain one
+          (e.g. use <command>echo -n "password" > file</command>).
           This file should be readable by the users that need to execute ssmtp.
         '';
       };
@@ -180,6 +181,8 @@ in
       source = "${pkgs.ssmtp}/bin/sendmail";
       setuid = false;
       setgid = false;
+      owner = "root";
+      group = "root";
     };
 
   };

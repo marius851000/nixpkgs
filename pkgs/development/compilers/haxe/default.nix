@@ -1,8 +1,8 @@
-{ lib, stdenv, fetchFromGitHub, coreutils, ocaml-ng, zlib, pcre, neko, mbedtls }:
+{ lib, stdenv, fetchFromGitHub, coreutils, ocaml-ng, zlib, pcre, neko, mbedtls, Security }:
 
 let
   ocamlDependencies = version:
-    if lib.versionAtLeast version "4.0"
+    if lib.versionAtLeast version "4.2"
     then with ocaml-ng.ocamlPackages; [
       ocaml
       findlib
@@ -13,8 +13,19 @@ let
       sha
       dune_2
       luv
-      (if lib.versionAtLeast version "4.2"
-      then ocaml_extlib else ocaml_extlib-1-7-7)
+      ocaml_extlib
+    ] else if lib.versionAtLeast version "4.0"
+    then with ocaml-ng.ocamlPackages_4_10; [
+      ocaml
+      findlib
+      sedlex_2
+      xml-light
+      ptmap
+      camlp5
+      sha
+      dune_2
+      luv
+      ocaml_extlib-1-7-7
     ] else with ocaml-ng.ocamlPackages_4_05; [
       ocaml
       camlp4
@@ -31,7 +42,8 @@ let
       inherit version;
 
       buildInputs = [ zlib pcre neko ]
-        ++ lib.optional (lib.versionAtLeast version "4.1") [ mbedtls ]
+        ++ lib.optional (lib.versionAtLeast version "4.1") mbedtls
+        ++ lib.optional (lib.versionAtLeast version "4.1" && stdenv.isDarwin) Security
         ++ ocamlDependencies version;
 
       src = fetchFromGitHub {

@@ -6,6 +6,12 @@ let
   ids = config.ids;
   cfg = config.users;
 
+  isPasswdCompatible = str: !(hasInfix ":" str || hasInfix "\n" str);
+  passwdEntry = type: lib.types.addCheck type isPasswdCompatible // {
+    name = "passwdEntry ${type.name}";
+    description = "${type.description}, not containing newlines or colons";
+  };
+
   # Check whether a password hash will allow login.
   allowsLogin = hash:
     hash == "" # login without password
@@ -54,7 +60,7 @@ let
     options = {
 
       name = mkOption {
-        type = types.str;
+        type = passwdEntry types.str;
         apply = x: assert (builtins.stringLength x < 32 || abort "Username '${x}' is longer than 31 characters which is not allowed!"); x;
         description = ''
           The name of the user account. If undefined, the name of the
@@ -63,7 +69,7 @@ let
       };
 
       description = mkOption {
-        type = types.str;
+        type = passwdEntry types.str;
         default = "";
         example = "Alice Q. User";
         description = ''
@@ -117,7 +123,7 @@ let
       group = mkOption {
         type = types.str;
         apply = x: assert (builtins.stringLength x < 32 || abort "Group name '${x}' is longer than 31 characters which is not allowed!"); x;
-        default = "nogroup";
+        default = "";
         description = "The user's primary group.";
       };
 
@@ -128,7 +134,7 @@ let
       };
 
       home = mkOption {
-        type = types.path;
+        type = passwdEntry types.path;
         default = "/var/empty";
         description = "The user's home directory.";
       };
@@ -157,7 +163,7 @@ let
       };
 
       shell = mkOption {
-        type = types.nullOr (types.either types.shellPackage types.path);
+        type = types.nullOr (types.either types.shellPackage (passwdEntry types.path));
         default = pkgs.shadow;
         defaultText = "pkgs.shadow";
         example = literalExample "pkgs.bashInteractive";
@@ -217,7 +223,7 @@ let
       };
 
       hashedPassword = mkOption {
-        type = with types; nullOr str;
+        type = with types; nullOr (passwdEntry str);
         default = null;
         description = ''
           Specifies the hashed password for the user.
@@ -251,7 +257,7 @@ let
       };
 
       initialHashedPassword = mkOption {
-        type = with types; nullOr str;
+        type = with types; nullOr (passwdEntry str);
         default = null;
         description = ''
           Specifies the initial hashed password for the user, i.e. the
@@ -318,12 +324,12 @@ let
 
   };
 
-  groupOpts = { name, ... }: {
+  groupOpts = { name, config, ... }: {
 
     options = {
 
       name = mkOption {
-        type = types.str;
+        type = passwdEntry types.str;
         description = ''
           The name of the group. If undefined, the name of the attribute set
           will be used.
@@ -340,7 +346,7 @@ let
       };
 
       members = mkOption {
-        type = with types; listOf str;
+        type = with types; listOf (passwdEntry str);
         default = [];
         description = ''
           The user names of the group members, added to the
@@ -352,6 +358,10 @@ let
 
     config = {
       name = mkDefault name;
+
+      members = mapAttrsToList (n: u: u.name) (
+        filterAttrs (n: u: elem config.name u.extraGroups) cfg.users
+      );
     };
 
   };
@@ -390,7 +400,7 @@ let
     };
   };
 
-  idsAreUnique = set: idAttr: !(fold (name: args@{ dup, acc }:
+  idsAreUnique = set: idAttr: !(foldr (name: args@{ dup, acc }:
     let
       id = builtins.toString (builtins.getAttr idAttr (builtins.getAttr name set));
       exists = builtins.hasAttr id acc;
@@ -413,12 +423,7 @@ let
           initialPassword initialHashedPassword;
         shell = utils.toShellPath u.shell;
       }) cfg.users;
-    groups = mapAttrsToList (n: g:
-      { inherit (g) name gid;
-        members = g.members ++ (mapAttrsToList (n: u: u.name) (
-          filterAttrs (n: u: elem g.name u.extraGroups) cfg.users
-        ));
-      }) cfg.groups;
+    groups = attrValues cfg.groups;
   });
 
   systemShells =
@@ -556,14 +561,16 @@ in {
       shadow.gid = ids.gids.shadow;
     };
 
-    system.activationScripts.users = stringAfter [ "stdio" ]
-      ''
+    system.activationScripts.users = {
+      supportsDryActivation = true;
+      text = ''
         install -m 0700 -d /root
         install -m 0755 -d /home
 
         ${pkgs.perl.withPackages (p: [ p.FileSlurp p.JSON ])}/bin/perl \
         -w ${./update-users-groups.pl} ${spec}
       '';
+    };
 
     # for backwards compatibility
     system.activationScripts.groups = stringAfter [ "users" ] "";
@@ -631,6 +638,16 @@ in {
             in xor isEffectivelySystemUser user.isNormalUser;
             message = ''
               Exactly one of users.users.${user.name}.isSystemUser and users.users.${user.name}.isNormalUser must be set.
+            '';
+          }
+          {
+            assertion = user.group != "";
+            message = ''
+              users.users.${user.name}.group is unset. This used to default to
+              nogroup, but this is unsafe. For example you can create a group
+              for this user with:
+              users.users.${user.name}.group = "${user.name}";
+              users.groups.${user.name} = {};
             '';
           }
         ]

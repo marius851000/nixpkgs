@@ -1,25 +1,35 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{ stdenv, lib, buildGoModule, fetchFromGitHub, pcsclite, pkg-config, PCSC, pivKeySupport ? true }:
 
 buildGoModule rec {
   pname = "cosign";
-  version = "0.2.0";
+  version = "1.2.1";
 
   src = fetchFromGitHub {
     owner = "sigstore";
     repo = pname;
     rev = "v${version}";
-    sha256 = "1zwb2q62ngb2zh1hasvq7r7pmrjlpgfhs5raibbhkxbk5kayvmii";
+    sha256 = "sha256-peR/TPydR4O6kGkRUpOgUCJ7xGRLbl9pYB1lAehjVK4=";
   };
 
-  vendorSha256 = "0nwbjaps4z5fhiknbj9pybxb6kgwb1vf2qhy0mzpycprf04q6g0v";
+  buildInputs =
+    lib.optional (stdenv.isLinux && pivKeySupport) (lib.getDev pcsclite)
+    ++ lib.optionals (stdenv.isDarwin && pivKeySupport) [ PCSC ];
 
-  subPackages = [ "cmd/cosign" ];
+  nativeBuildInputs = [ pkg-config ];
+
+  vendorSha256 = "sha256-DyRMQ43BJOkDtWEqmAzqICyaSyQJ9H4i69VJ4dCGF44=";
+
+  excludedPackages = "\\(copasetic\\|sample\\|webhook\\)";
+
+  tags = lib.optionals pivKeySupport [ "pivkey" ];
+
+  ldflags = [ "-s" "-w" "-X github.com/sigstore/cosign/cmd/cosign/cli.GitVersion=v${version}" ];
 
   meta = with lib; {
     homepage = "https://github.com/sigstore/cosign";
     changelog = "https://github.com/sigstore/cosign/releases/tag/v${version}";
     description = "Container Signing CLI with support for ephemeral keys and Sigstore signing";
     license = licenses.asl20;
-    maintainers = with maintainers; [ lesuisse ];
+    maintainers = with maintainers; [ lesuisse jk ];
   };
 }

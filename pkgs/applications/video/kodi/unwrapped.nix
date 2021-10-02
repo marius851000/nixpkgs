@@ -6,7 +6,7 @@
 , openssl, gperf, tinyxml2, taglib, libssh, swig, jre_headless
 , gtest, ncurses, spdlog
 , libxml2, systemd
-, alsaLib, libGLU, libGL, fontconfig, freetype, ftgl
+, alsa-lib, libGLU, libGL, fontconfig, freetype, ftgl
 , libjpeg, libpng, libtiff
 , libmpeg2, libsamplerate, libmad
 , libogg, libvorbis, flac, libxslt
@@ -38,15 +38,15 @@ assert usbSupport -> !udevSupport; # libusb-compat-0_1 won't be used if udev is 
 assert gbmSupport || waylandSupport || x11Support;
 
 let
-  kodiReleaseDate = "20210219";
-  kodiVersion = "19.0";
+  kodiReleaseDate = "20210508";
+  kodiVersion = "19.1";
   rel = "Matrix";
 
   kodi_src = fetchFromGitHub {
     owner  = "xbmc";
     repo   = "xbmc";
     rev    = "${kodiVersion}-${rel}";
-    sha256 = "097dg6a7v4ia85jx1pmlpwzdpqcqxlrmniqd005q73zvgj67zc2p";
+    sha256 = "0jh67vw3983lnfgqzqfislawwbpq0vxxk1ljsg7mar06mlwfxb7h";
   };
 
   ffmpeg = stdenv.mkDerivation rec {
@@ -79,21 +79,21 @@ let
   libdvdcss = fetchFromGitHub {
     owner = "xbmc";
     repo = "libdvdcss";
-    rev = "1.4.2-${rel}-Beta-5";
+    rev = "1.4.2-Leia-Beta-5";
     sha256 = "0j41ydzx0imaix069s3z07xqw9q95k7llh06fc27dcn6f7b8ydyl";
   };
 
   libdvdnav = fetchFromGitHub {
     owner = "xbmc";
     repo = "libdvdnav";
-    rev = "6.0.0-${rel}-Alpha-3";
+    rev = "6.0.0-Leia-Alpha-3";
     sha256 = "0qwlf4lgahxqxk1r2pzl866mi03pbp7l1fc0rk522sc0ak2s9jhb";
   };
 
   libdvdread = fetchFromGitHub {
     owner = "xbmc";
     repo = "libdvdread";
-    rev = "6.0.0-${rel}-Alpha-3";
+    rev = "6.0.0-Leia-Alpha-3";
     sha256 = "1xxn01mhkdnp10cqdr357wx77vyzfb5glqpqyg8m0skyi75aii59";
   };
 
@@ -114,7 +114,7 @@ in stdenv.mkDerivation {
       gettext pcre-cpp yajl fribidi libva libdrm
       openssl gperf tinyxml2 taglib libssh
       gtest ncurses spdlog
-      alsaLib libGL libGLU fontconfig freetype ftgl
+      alsa-lib libGL libGLU fontconfig freetype ftgl
       libjpeg libpng libtiff
       libmpeg2 libsamplerate libmad
       libogg libvorbis flac libxslt systemd
@@ -127,6 +127,7 @@ in stdenv.mkDerivation {
       bluez giflib glib harfbuzz lcms2 libpthreadstubs
       ffmpeg flatbuffers fmt fstrcmp rapidjson
       lirc
+      mesa # for libEGL
     ]
     ++ lib.optional x11Support [
       libX11 xorgproto libXt libXmu libXext.dev libXdmcp

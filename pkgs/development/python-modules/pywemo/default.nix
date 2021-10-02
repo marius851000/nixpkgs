@@ -13,7 +13,7 @@
 
 buildPythonPackage rec {
   pname = "pywemo";
-  version = "0.6.4";
+  version = "0.6.7";
   format = "pyproject";
   disabled = pythonOlder "3.7";
 
@@ -21,10 +21,12 @@ buildPythonPackage rec {
     owner = pname;
     repo = pname;
     rev = version;
-    sha256 = "1hm1vs6m65vqar0lcjnynz0d9y9ri5s75fzhvp0yfjkcnp06gnfa";
+    sha256 = "sha256-g3/xMCCCsn2EY1DsRuZAcfUIsdkP3mEkYlI+KjYKXOk=";
   };
 
-  nativeBuildInputs = [ poetry-core ];
+  nativeBuildInputs = [
+    poetry-core
+  ];
 
   propagatedBuildInputs = [
     ifaddr
@@ -36,11 +38,6 @@ buildPythonPackage rec {
   checkInputs = [
     pytest-vcr
     pytestCheckHook
-  ];
-
-  disabledTests = [
-    # https://github.com/pywemo/pywemo/issues/264
-    "test_rules_db_from_device"
   ];
 
   pythonImportsCheck = [ "pywemo" ];

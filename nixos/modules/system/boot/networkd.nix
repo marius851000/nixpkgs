@@ -384,6 +384,7 @@ let
           "AllMulticast"
           "Unmanaged"
           "RequiredForOnline"
+          "ActivationPolicy"
         ])
         (assertMacAddress "MACAddress")
         (assertByteFormat "MTUBytes")
@@ -401,6 +402,14 @@ let
           "degraded"
           "enslaved"
           "routable"
+        ]))
+        (assertValueOneOf "ActivationPolicy" ([
+          "up"
+          "always-up"
+          "manual"
+          "always-down"
+          "down"
+          "bound"
         ]))
       ];
 
@@ -716,10 +725,17 @@ let
           "NTP"
           "EmitSIP"
           "SIP"
+          "EmitPOP3"
+          "POP3"
+          "EmitSMTP"
+          "SMTP"
+          "EmitLPR"
+          "LPR"
           "EmitRouter"
           "EmitTimezone"
           "Timezone"
           "SendOption"
+          "SendVendorOption"
         ])
         (assertInt "PoolOffset")
         (assertMinimum "PoolOffset" 0)
@@ -728,6 +744,9 @@ let
         (assertValueOneOf "EmitDNS" boolValues)
         (assertValueOneOf "EmitNTP" boolValues)
         (assertValueOneOf "EmitSIP" boolValues)
+        (assertValueOneOf "EmitPOP3" boolValues)
+        (assertValueOneOf "EmitSMTP" boolValues)
+        (assertValueOneOf "EmitLPR" boolValues)
         (assertValueOneOf "EmitRouter" boolValues)
         (assertValueOneOf "EmitTimezone" boolValues)
       ];

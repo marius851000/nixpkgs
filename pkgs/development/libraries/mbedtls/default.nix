@@ -28,13 +28,13 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
 
-  postConfigure = lib.optionals enableThreading ''
+  postConfigure = lib.optionalString enableThreading ''
     perl scripts/config.pl set MBEDTLS_THREADING_C    # Threading abstraction layer
     perl scripts/config.pl set MBEDTLS_THREADING_PTHREAD    # POSIX thread wrapper layer for the threading layer.
   '';
 
   cmakeFlags = [ "-DUSE_SHARED_MBEDTLS_LIBRARY=on" ];
-  NIX_CFLAGS_COMPILE = [
+  NIX_CFLAGS_COMPILE = lib.optionals stdenv.cc.isGNU [
     "-Wno-error=format"
     "-Wno-error=format-truncation"
   ];

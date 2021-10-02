@@ -9,13 +9,13 @@
 
 buildPythonPackage rec {
   pname = "zha-quirks";
-  version = "0.0.56";
+  version = "0.0.61";
 
   src = fetchFromGitHub {
     owner = "zigpy";
     repo = "zha-device-handlers";
     rev = version;
-    sha256 = "1jss5pnxdjlp0kplqxgr09vv1zq9n7l9w08hsywy2vglqmd67a66";
+    sha256 = "sha256-uDQAXH0p8Ly0ZbwNlkVo1b7fAXSu77U7v3BHd0B1YQk=";
   };
 
   propagatedBuildInputs = [

@@ -7,7 +7,6 @@
 , elementary-gtk-theme
 , elementary-icon-theme
 , fetchFromGitHub
-, fetchpatch
 , flatpak
 , gettext
 , glib
@@ -15,6 +14,7 @@
 , gtk3
 , json-glib
 , libgee
+, libhandy
 , libsoup
 , libxml2
 , meson
@@ -25,20 +25,28 @@
 , python3
 , vala
 , polkit
-, libhandy_0
 , wrapGAppsHook
 }:
 
 stdenv.mkDerivation rec {
   pname = "appcenter";
-  version = "3.5.1";
+  version = "3.8.0";
 
   src = fetchFromGitHub {
     owner = "elementary";
     repo = pname;
     rev = version;
-    sha256 = "sha256-8r0DlmG8xlCQ1uFHZQjXG2ls4VBrsRzrVY8Ey3/OYAU=";
+    sha256 = "07lkdpnjj9pxbq8h794qjiidvnysvzx0132w98r1wg9k7ca170bj";
   };
+
+  patches = [
+    # Try to remove other backends to make flatpak backend work.
+    # https://github.com/NixOS/nixpkgs/issues/70214
+    ./flatpak-only.patch
+    # The homepage banner does not show up on first run,
+    # has issues with app icon and mouse scrolling.
+    ./drop-homepage-banner.patch
+  ];
 
   passthru = {
     updateScript = nix-update-script {
@@ -69,7 +77,7 @@ stdenv.mkDerivation rec {
     gtk3
     json-glib
     libgee
-    libhandy_0 # doesn't support libhandy-1 yet
+    libhandy
     libsoup
     libxml2
     packagekit
@@ -77,7 +85,6 @@ stdenv.mkDerivation rec {
   ];
 
   mesonFlags = [
-    "-Dhomepage=false"
     "-Dpayments=false"
     "-Dcurated=false"
   ];
@@ -92,6 +99,6 @@ stdenv.mkDerivation rec {
     description = "An open, pay-what-you-want app store for indie developers, designed for elementary OS";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
-    maintainers = pantheon.maintainers;
+    maintainers = teams.pantheon.members;
   };
 }

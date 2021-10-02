@@ -7,7 +7,7 @@
 
 buildPythonPackage rec {
   pname = "pytube";
-  version = "10.7.1";
+  version = "11.0.1";
 
   disabled = pythonOlder "3.6";
 
@@ -15,7 +15,7 @@ buildPythonPackage rec {
     owner = "pytube";
     repo = "pytube";
     rev = "v${version}";
-    sha256 = "sha256-a9MYEQFJXfPXYkWiuZkjt/PGs73Dm5614/Xvv6Nn8RA=";
+    sha256 = "04s4hganb6x0dlfyyg9gjah5z0vxd7bxzqwgvd28hqnf0iwc2byb";
   };
 
   checkInputs = [

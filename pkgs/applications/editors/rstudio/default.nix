@@ -42,8 +42,8 @@ mkDerivation rec {
   postPatch = ''
     substituteInPlace src/cpp/core/r_util/REnvironmentPosix.cpp --replace '@R@' ${R}
     substituteInPlace src/cpp/core/libclang/LibClang.cpp \
-      --replace '@clang@' ${llvmPackages.clang.cc} \
-      --replace '@libclang.so@' ${llvmPackages.clang.cc.lib}/lib/libclang.so
+      --replace '@libclang@' ${llvmPackages.libclang.lib} \
+      --replace '@libclang.so@' ${llvmPackages.libclang.lib}/lib/libclang.so
   '';
 
   ginSrc = fetchurl {
@@ -135,7 +135,7 @@ mkDerivation rec {
     { description = "Set of integrated tools for the R language";
       homepage = "https://www.rstudio.com/";
       license = licenses.agpl3;
-      maintainers = with maintainers; [ ehmry changlinli ciil ];
+      maintainers = with maintainers; [ changlinli ciil ];
       platforms = platforms.linux;
     };
 }

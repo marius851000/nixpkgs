@@ -8,10 +8,11 @@
 assert enablePython -> python != null;
 
 stdenv.mkDerivation rec {
-  name = "audit-2.8.5"; # at the next release, remove the patches below!
+  pname = "audit";
+  version = "2.8.5"; # at the next release, remove the patches below!
 
   src = fetchurl {
-    url = "https://people.redhat.com/sgrubb/audit/${name}.tar.gz";
+    url = "https://people.redhat.com/sgrubb/audit/audit-${version}.tar.gz";
     sha256 = "1dzcwb2q78q7x41shcachn7f4aksxbxd470yk38zh03fch1l2p8f";
   };
 
@@ -61,7 +62,7 @@ stdenv.mkDerivation rec {
   # --whole-archive linker flag is required to be sure that linker
   # correctly chooses strong version of symbol regardless of order of
   # object files at command line.
-  + lib.optionalString stdenv.targetPlatform.isStatic ''
+  + lib.optionalString stdenv.hostPlatform.isStatic ''
     export LDFLAGS=-Wl,--whole-archive
   '';
   meta = {

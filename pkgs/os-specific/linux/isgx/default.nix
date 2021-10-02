@@ -1,23 +1,15 @@
-{ stdenv, lib, fetchFromGitHub, fetchpatch, kernel, kernelAtLeast }:
+{ stdenv, lib, fetchFromGitHub, kernel, kernelAtLeast }:
 
 stdenv.mkDerivation rec {
   name = "isgx-${version}-${kernel.version}";
-  version = "2.11";
+  version = "2.14";
 
   src = fetchFromGitHub {
     owner = "intel";
     repo = "linux-sgx-driver";
-    rev = "sgx_driver_${version}";
-    hash = "sha256-zZ0FgCx63LCNmvQ909O27v/o4+93gefhgEE/oDr/bHw=";
+    rev = "sgx_diver_${version}"; # Typo is upstream's.
+    sha256 = "0kbbf2inaywp44lm8ig26mkb36jq3smsln0yp6kmrirdwc3c53mi";
   };
-
-  patches = [
-    # Fixes build with kernel >= 5.8
-    (fetchpatch {
-      url = "https://github.com/intel/linux-sgx-driver/commit/276c5c6a064d22358542f5e0aa96b1c0ace5d695.patch";
-      sha256 = "sha256-PmchqYENIbnJ51G/tkdap/g20LUrJEoQ4rDtqy6hj24=";
-    })
-  ];
 
   hardeningDisable = [ "pic" ];
 
@@ -33,6 +25,8 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  enableParallelBuilding = true;
+
   meta = with lib; {
     description = "Intel SGX Linux Driver";
     longDescription = ''
@@ -46,8 +40,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/intel/linux-sgx-driver";
     license = with licenses; [ bsd3 /* OR */ gpl2Only ];
     maintainers = with maintainers; [ oxalica ];
-    platforms = platforms.linux;
-    # The driver is already in kernel >= 5.11.0.
-    broken = kernelAtLeast "5.11.0";
+    platforms = [ "x86_64-linux" ];
   };
 }
