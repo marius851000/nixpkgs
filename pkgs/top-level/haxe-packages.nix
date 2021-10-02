@@ -150,8 +150,8 @@ let
 
     flixel = buildHaxeLib {
       libname = "flixel";
-      version = "4.8.1";
-      sha256 = "1m7l92xg6nndy7m98yfmcrsqvd2rhafckx1xbv0im69y823c27a3";
+      version = "4.10.0";
+      sha256 = "sha256-VfHp8H5CpaPJFnwBkxOd9uDZ2F9i5e2wAtBcdxNTY+8=";
       meta = with lib; {
         license = licenses.mit;
         description = "2D game engine based on OpenFL that delivers cross-platform games";
@@ -160,8 +160,8 @@ let
 
     flixel-addons = buildHaxeLib {
       libname = "flixel-addons";
-      version = "2.9.0";
-      sha256 = "1zz1pcp20j3r87m0laq32dg0708kir3188dpgpx7c3c3mmxlw6sp";
+      version = "2.11.0";
+      sha256 = "sha256-mRKpLzhlh1UXxIdg1/a0NTVzriNEW1wsSirL1UOkvAI=";
       meta = with lib; {
         license = licenses.mit;
         description = "Set of useful, but optional classes for HaxeFlixel created by the community";
@@ -170,8 +170,8 @@ let
 
     flixel-ui = buildHaxeLib {
       libname = "flixel-ui";
-      version = "2.3.3";
-      sha256 = "1xrsjzcg1wv7j9fbifcg5v9zvfr1vhs0spar8nmi86liiqv1iwka";
+      version = "2.4.0";
+      sha256 = "sha256-5oNeDQWkA8Sfrl+kEi7H2DLOc5N2DfbbcwiRw5DBSGw=";
       meta = with lib; {
         license = licenses.mit;
         description = "UI library for Flixel";
@@ -194,8 +194,8 @@ let
       src = fetchFromGitHub {
         owner = "larsiusprime";
         repo = "polymod";
-        rev = "bb5f0a120419ac3a7132d96aff1e6f7a36b97d67";
-        sha256 = "1afrajf4mcw0kqz64gsa8h71r54c4i6hhb2pn6kw6z4rg3ilixlf";
+        rev = "58ca4d726a8753fdc59e58b7a9885840fe0b4c51";
+        sha256 = "sha256-yUB31tSBy3SyRmZsouohtKU1mRm3chnrIiV5x7kcxHU=";
       };
       meta = with lib; {
         license = licenses.mit;
@@ -225,8 +225,8 @@ let
       src = fetchFromGitHub {
         owner = "AndreiRudenko";
         repo = "linc_luajit";
-        rev = "e0e1e43799abcfa9afcfb1edb7c29d174546ac03";
-        sha256 = "sha256-PIg/kRdz10d2AkvHTro1cCFqPPJO2uv7yPVnNAnLuJs=";
+        rev = "04ef1e0bbbe9a64b8066d1315a89c36022291d31";
+        sha256 = "sha256-h824uR5kvKvmBVY+iraErCXZSgLcVuYwj8SyKx+V8+o=";
       };
       prePatch = "rm -r lib";
       meta = with lib; {
