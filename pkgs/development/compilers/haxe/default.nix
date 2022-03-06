@@ -147,7 +147,7 @@ in {
     sha256 = "0rns6d28qzkbai6yyws08yzbyvxfn848nj0fsji7chdi0y7pzzj0";
   };
   haxe_4_2 = generic {
-    version = "4.2.1";
-    sha256 = "sha256-0j6M21dh8DB1gC/bPYNJrVuDbJyqQbP+61ItO5RBUcA=";
+    version = "4.2.4";
+    sha256 = "sha256-04WrrNSOAijd72TfSdUsTmnTPj6tqp/L2fcZKa7Zaj8=";
   };
 }
