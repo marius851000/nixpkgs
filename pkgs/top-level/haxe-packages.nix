@@ -249,5 +249,20 @@ let
       };
     };
 
+    linc_luajit = buildHaxeLib {
+      libname = "linc_luajit";
+      version = "unstable-2022-02-10";
+      src = fetchFromGitHub {
+        owner = "AndreiRudenko";
+        repo = "linc_luajit";
+        rev = "7c7376ad7c2e8e8695dd63ecd8c7b0ef45d1815d";
+        sha256 = "sha256-R4lFEA+vl/Q7dEp8ZOKzyMVZuIMsk+PQgniAaXb8neU=";
+      };
+      meta = with lib; {
+        license = licenses.mit;
+        description = "Haxe bindings for LuaJIT";
+      };
+    };
+
   };
 in self

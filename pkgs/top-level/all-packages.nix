@@ -32917,6 +32917,8 @@ with pkgs;
 
   funkin = callPackage ../games/funkin { };
 
+  psych-engine = callPackage ../games/psych-engine { }; #TODO: ensure it is in the right place in the all-packages list
+
   galaxis = callPackage ../games/galaxis { };
 
   gambatte = callPackage ../games/gambatte { };
