@@ -255,8 +255,8 @@ let
       src = fetchFromGitHub {
         owner = "AndreiRudenko";
         repo = "linc_luajit";
-        rev = "7c7376ad7c2e8e8695dd63ecd8c7b0ef45d1815d";
-        sha256 = "sha256-R4lFEA+vl/Q7dEp8ZOKzyMVZuIMsk+PQgniAaXb8neU=";
+        rev = "3206df7b6c58718874c6c8ab4d076284e0d07bc0";
+        sha256 = "Bdiy4rQnxxfyS+MrzflHC2n9Eiz/Avm5tSN9uvbra6Y=";
       };
       meta = with lib; {
         license = licenses.mit;
