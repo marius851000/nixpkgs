@@ -1,23 +1,27 @@
-{ lib, stdenv, fetchurl, fetchpatch
+{ lib, stdenv, fetchurl, fetchpatch, fetchgit
 , bzip2
 , expat
 , libffi
 , gdbm
+, withGdbm ? !stdenv.hostPlatform.isWindows
 , xz
 , mailcap, mimetypesSupport ? true
 , ncurses
 , openssl
 , openssl_legacy
 , readline
+, withReadline ? !stdenv.hostPlatform.isWindows && (readline != null)
 , sqlite
 , tcl ? null, tk ? null, tix ? null, libX11 ? null, xorgproto ? null, x11Support ? false
 , bluez ? null, bluezSupport ? false
 , zlib
 , tzdata ? null
-, libxcrypt
+, libxcrypt ? null
+, withLibxcrypt ? !stdenv.hostPlatform.isWindows && (libxcrypt != null)
 , self
 , configd
 , darwin
+, windows
 , autoreconfHook
 , autoconf-archive
 , pkg-config
@@ -127,12 +131,16 @@ let
   ];
 
   buildInputs = filter (p: p != null) ([
-    zlib bzip2 expat xz libffi libxcrypt gdbm sqlite readline ncurses openssl' ]
+    zlib bzip2 expat xz libffi sqlite ncurses openssl' ]
+    ++ optional withGdbm gdbm
+    ++ optional withReadline readline
+    ++ optional withLibxcrypt libxcrypt
     ++ optionals x11Support [ tcl tk libX11 xorgproto ]
     ++ optionals (bluezSupport && stdenv.isLinux) [ bluez ]
     ++ optionals stdenv.isDarwin [ configd ])
 
     ++ optionals enableFramework [ Cocoa ]
+    ++ optionals stdenv.hostPlatform.isMinGW [ windows.mingw_w64_pthreads windows.dlfcn ]
     ++ optionals tzdataSupport [ tzdata ];  # `zoneinfo` module
 
   hasDistutilsCxxPatch = !(stdenv.cc.isGNU or false);
@@ -154,6 +162,8 @@ let
   # are not documented, and must be derived from the configure script (see links
   # below).
   sysconfigdataHook = with stdenv.hostPlatform; with passthru; let
+    machdep = if isWindows then "win32" else parsed.kernel.name; # win32 is added by Fedora’s patch
+
     # https://github.com/python/cpython/blob/e488e300f5c01289c10906c2e53a8e43d6de32d8/configure.ac#L428
     # The configure script uses "arm" as the CPU name for all 32-bit ARM
     # variants when cross-compiling, but native builds include the version
@@ -170,7 +180,7 @@ let
         powerpc64 = "ppc64";
         powerpc64le = "ppc64le";
       }.${parsed.cpu.name} or parsed.cpu.name;
-    in "${parsed.kernel.name}-${cpu}";
+    in "${machdep}-${cpu}";
 
     # https://github.com/python/cpython/blob/e488e300f5c01289c10906c2e53a8e43d6de32d8/configure.ac#L724
     multiarchCpu =
@@ -197,12 +207,13 @@ let
       else "gnu";
     multiarch =
       if isDarwin then "darwin"
-      else "${multiarchCpu}-${parsed.kernel.name}-${pythonAbiName}";
+      else if isWindows then ""
+      else "${multiarchCpu}-${machdep}-${pythonAbiName}";
 
     abiFlags = optionalString isPy37 "m";
 
     # https://github.com/python/cpython/blob/e488e300f5c01289c10906c2e53a8e43d6de32d8/configure.ac#L78
-    pythonSysconfigdataName = "_sysconfigdata_${abiFlags}_${parsed.kernel.name}_${multiarch}";
+    pythonSysconfigdataName = "_sysconfigdata_${abiFlags}_${machdep}_${multiarch}";
   in ''
     sysconfigdataHook() {
       if [ "$1" = '${placeholder "out"}' ]; then
@@ -214,12 +225,20 @@ let
     addEnvHooks "$hostOffset" sysconfigdataHook
   '';
 
+  mingw_patch = fetchgit {
+    name = "mingw-python-patches";
+    url = "https://src.fedoraproject.org/rpms/mingw-python3.git";
+    rev = "b1b0c826c42cd8b413d7ab39bf2633b34b163567"; # specifically for python 3.11.2, should work with 3.11.3 too
+    sha256 = "sha256-ieCXhaZSseYrDNriRUvQ8bUU/R7+Kh47ba/YutceMe8=";
+  };
+
+  execSuffix = stdenv.hostPlatform.extensions.executable;
 in with passthru; stdenv.mkDerivation {
   pname = "python3";
   inherit version;
 
   inherit nativeBuildInputs;
-  buildInputs = [ bash ] ++ buildInputs; # bash is only for patchShebangs
+  buildInputs = (lib.optional (!stdenv.hostPlatform.isWindows) bash) ++ buildInputs; # bash is only used for patchShebangs
 
   src = fetchurl {
     url = with sourceVersion; "https://www.python.org/ftp/python/${major}.${minor}.${patch}/Python-${version}.tar.xz";
@@ -288,9 +307,12 @@ in with passthru; stdenv.mkDerivation {
     ./3.8/0001-On-all-posix-systems-not-just-Darwin-set-LDSHARED-if.patch
     # Use sysconfigdata to find headers. Fixes cross-compilation of extension modules.
     ./3.7/fix-finding-headers-when-cross-compiling.patch
+  ] ++ optionals (stdenv.hostPlatform.isMinGW) [
+    "${mingw_patch}/*.patch"
+    ./windows-cross.diff
   ];
 
-  postPatch = ''
+  postPatch = optionalString (!stdenv.hostPlatform.isWindows) ''
     substituteInPlace Lib/subprocess.py \
       --replace "'/bin/sh'" "'${bash}/bin/sh'"
   '' + optionalString mimetypesSupport ''
@@ -303,7 +325,7 @@ in with passthru; stdenv.mkDerivation {
   env = {
     CPPFLAGS = concatStringsSep " " (map (p: "-I${getDev p}/include") buildInputs);
     LDFLAGS = concatStringsSep " " (map (p: "-L${getLib p}/lib") buildInputs);
-    LIBS = "${optionalString (!stdenv.isDarwin) "-lcrypt"}";
+    LIBS = "${optionalString (!stdenv.isDarwin && !stdenv.hostPlatform.isWindows) "-lcrypt"}";
     NIX_LDFLAGS = lib.optionalString (stdenv.cc.isGNU && !stdenv.hostPlatform.isStatic) ({
       "glibc" = "-lgcc_s";
       "musl" = "-lgcc_eh";
@@ -331,7 +353,7 @@ in with passthru; stdenv.mkDerivation {
     "--enable-loadable-sqlite-extensions"
   ] ++ optionals (openssl' != null) [
     "--with-openssl=${openssl'.dev}"
-  ] ++ optionals (libxcrypt != null) [
+  ] ++ optionals (withLibxcrypt) [
     "CFLAGS=-I${libxcrypt}/include"
     "LIBS=-L${libxcrypt}/lib"
   ] ++ optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
@@ -363,7 +385,8 @@ in with passthru; stdenv.mkDerivation {
     "ac_cv_func_lchmod=no"
   ] ++ optionals tzdataSupport [
     "--with-tzpath=${tzdata}/share/zoneinfo"
-  ] ++ optional static "LDFLAGS=-static";
+  ] ++ optional static "LDFLAGS=-static"
+  ++ optional (execSuffix != "") "--with-suffix=${execSuffix}";
 
   preConfigure = optionalString (pythonOlder "3.12") ''
     for i in /usr /sw /opt /pkg; do	# improve purity
@@ -396,10 +419,9 @@ in with passthru; stdenv.mkDerivation {
   postInstall = let
     # References *not* to nuke from (sys)config files
     keep-references = concatMapStringsSep " " (val: "-e ${val}") ([
-      (placeholder "out") libxcrypt
-    ] ++ optionals tzdataSupport [
-      tzdata
-    ]);
+      (placeholder "out")
+    ] ++ optional withLibxcrypt libxcrypt
+    ++ optional tzdataSupport tzdata);
   in lib.optionalString enableFramework ''
     for dir in include lib share; do
       ln -s $out/Library/Frameworks/Python.framework/Versions/Current/$dir $out/$dir
@@ -428,7 +450,7 @@ in with passthru; stdenv.mkDerivation {
     # Use Python3 as default python
     ln -s "$out/bin/idle3" "$out/bin/idle"
     ln -s "$out/bin/pydoc3" "$out/bin/pydoc"
-    ln -s "$out/bin/python3" "$out/bin/python"
+    ln -s "$out/bin/python3${execSuffix}" "$out/bin/python${execSuffix}"
     ln -s "$out/bin/python3-config" "$out/bin/python-config"
     ln -s "$out/lib/pkgconfig/python3.pc" "$out/lib/pkgconfig/python.pc"
 
@@ -483,6 +505,14 @@ in with passthru; stdenv.mkDerivation {
     # bytecode compilations for the same reason - we don't want bytecode generated.
     mkdir -p $out/share/gdb
     sed '/^#!/d' Tools/gdb/libpython.py > $out/share/gdb/libpython.py
+  '' + optionalString stdenv.hostPlatform.isWindows ''
+    # Shebang files that link against the build python. Shebang don’t work on windows
+    rm $out/bin/2to3*
+    rm $out/bin/idle*
+    rm $out/bin/pydoc*
+
+    echo linking DLLs for python’s compiled librairies
+    linkDLLsInfolder $out/lib/python*/lib-dynload/
   '';
 
   preFixup = lib.optionalString (stdenv.hostPlatform != stdenv.buildPlatform) ''

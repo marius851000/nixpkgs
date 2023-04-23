@@ -1,0 +1,22 @@
+diff --git a/configure.ac b/configure.ac
+index f4d3bad..9a518e2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6239,17 +6239,6 @@ if test "x$cross_compiling" = xyes; then
+   fi
+ fi
+ 
+-AC_CHECK_FILE(/dev/ptmx, [], [])
+-if test "x$ac_cv_file__dev_ptmx" = xyes; then
+-  AC_DEFINE(HAVE_DEV_PTMX, 1,
+-  [Define to 1 if you have the /dev/ptmx device file.])
+-fi
+-AC_CHECK_FILE(/dev/ptc, [], [])
+-if test "x$ac_cv_file__dev_ptc" = xyes; then
+-  AC_DEFINE(HAVE_DEV_PTC, 1,
+-  [Define to 1 if you have the /dev/ptc device file.])
+-fi
+-
+ if test $ac_sys_system = Darwin
+ then
+ 	LIBS="$LIBS -framework CoreFoundation"
