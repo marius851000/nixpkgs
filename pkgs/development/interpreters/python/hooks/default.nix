@@ -97,11 +97,12 @@ in {
       };
     } ./python-imports-check-hook.sh) {};
 
-  pythonNamespacesHook = callPackage ({ makePythonHook, findutils }:
+  pythonNamespacesHook = callPackage ({ makePythonHook, buildPackages }:
     makePythonHook {
       name = "python-namespaces-hook.sh";
       substitutions = {
-        inherit pythonSitePackages findutils;
+        inherit pythonSitePackages;
+        findutils = buildPackages.findutils;
       };
     } ./python-namespaces-hook.sh) {};
 
