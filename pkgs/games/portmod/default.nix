@@ -9,23 +9,24 @@
 , rustPlatform
 , tes3cmd
 , tr-patcher
+, perl
 }:
 
 let
-  version = "2.6.2";
+  version = "2.7.1";
 
   src = fetchFromGitLab {
     owner = "portmod";
     repo = "Portmod";
     rev = "v${version}";
-    hash = "sha256-ufr2guaPdCvI5JOicL/lTrT3t6UlaY1hEB2xbwzhw6A=";
+    hash = "sha256-5DWGADDmpMMGS8Fi+3iINSuL8TK8fOzQtuB5mESihSI=";
   };
 
-  portmod-rust = rustPlatform.buildRustPackage rec {
+  portmod-rust = rustPlatform.buildRustPackage {
     inherit src version;
     pname = "portmod-rust";
 
-    cargoHash = "sha256-sAjgGVVjgXaWbmN/eGEvatYjkHeFTZNX1GXFcJqs3GI=";
+    cargoHash = "sha256-FgEelTfbx2C0cF47UtOhEVdrPRhyExUDvegMq+irk1Q=";
 
     nativeBuildInputs = [
       python3Packages.python
@@ -42,10 +43,11 @@ let
     tes3cmd
     imagemagick
     openmw
+    perl
   ];
 
 in
-python3Packages.buildPythonApplication rec {
+python3Packages.buildPythonApplication {
   inherit src version;
 
   pname = "portmod";
